@@ -9,7 +9,7 @@ public class PlayerTransform : NetworkBehaviour {
     /// <summary>
     /// A toggle to test the difference between owner and server auth.
     /// </summary>
-    [SerializeField] private bool _serverAuth;
+    [SerializeField] private bool _usingServerAuth;
     [SerializeField] private float _cheapInterpolationTime = 0.1f;
 
     private NetworkVariable<PlayerNetworkState> _playerState;
@@ -18,7 +18,7 @@ public class PlayerTransform : NetworkBehaviour {
     private void Awake() {
         _rb = GetComponent<Rigidbody>();
 
-        var permission = _serverAuth ? NetworkVariableWritePermission.Server : NetworkVariableWritePermission.Owner;
+        var permission = _usingServerAuth ? NetworkVariableWritePermission.Server : NetworkVariableWritePermission.Owner;
         _playerState = new NetworkVariable<PlayerNetworkState>(writePerm: permission);
     }
 
@@ -39,7 +39,7 @@ public class PlayerTransform : NetworkBehaviour {
             Rotation = transform.rotation.eulerAngles
         };
 
-        if (IsServer || !_serverAuth)
+        if (IsServer || !_usingServerAuth)
             _playerState.Value = state;
         else
             TransmitStateServerRpc(state);
